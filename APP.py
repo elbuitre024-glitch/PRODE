@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 
 # --- CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="Prode Zonal 2026", icon="⚽")
+
 st.title("🏆 Prode Liga Zonal")
 
 # --- LISTA DE PARTIDOS (FECHA 1) ---
@@ -40,4 +40,5 @@ with tab2:
     # Ejemplo de cómo calcularías los puntos
     st.info("Aquí aparecerá la tabla cuando cargues los resultados reales.")
     # data = pd.DataFrame({"Jugador": ["Gringo", "Cacho"], "Puntos": [15, 12]})
+
     # st.table(data.sort_values(by="Puntos", ascending=False))
