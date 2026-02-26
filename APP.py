@@ -3,8 +3,6 @@ import pandas as pd
 from datetime import datetime
 from streamlit_gsheets import GSheetsConnection
 
-# 1. Configuración (SIEMPRE PRIMERO)
-st.set_page_config(page_title="Prode Zonal 2026", page_icon="⚽")
 
 # 2. Conexión a Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
@@ -50,3 +48,4 @@ with tab1:
 
 with tab2:
     st.write("Acá verás los puntos pronto...")
+
