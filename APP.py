@@ -1,12 +1,16 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from streamlit_gsheets import GSheetsConnection
 
-# --- CONFIGURACIÓN DE PÁGINA ---
+# 1. Configuración (SIEMPRE PRIMERO)
+st.set_page_config(page_title="Prode Zonal 2026", page_icon="⚽")
+
+# 2. Conexión a Google Sheets
+conn = st.connection("gsheets", type=GSheetsConnection)
 
 st.title("🏆 Prode Liga Zonal")
 
-# --- LISTA DE PARTIDOS (FECHA 1) ---
 partidos = [
     "Colonial vs Arenales (1ra)", "Social vs Singlar (1ra)", 
     "Belgrano vs Huracán (1ra)", "12 de Octubre vs Agustina (1ra)",
@@ -14,31 +18,35 @@ partidos = [
     "Belgrano vs Huracán (Res)", "12 de Octubre vs Agustina (Res)"
 ]
 
-# --- PESTAÑAS ---
-tab1, tab2 = st.tabs(["📝 Cargar Pronósticos", "📊 Tabla de Posiciones"])
+tab1, tab2 = st.tabs(["📝 Cargar Pronósticos", "📊 Tabla"])
 
 with tab1:
-    st.header("Cargá tus resultados")
-    nombre = st.selectbox("Elegí tu nombre", ["Juan", "Pedro", "Gringo", "Cacho"]) # Aquí van tus amigos
-    
-    # Creamos 8 filas de predicción
-    preds = []
-    for p in partidos:
-        col1, col2, col3 = st.columns([2, 1, 1])
-        with col1: st.write(p)
-        with col2: l = st.number_input("Local", min_value=0, step=1, key=f"{p}_l")
-        with col3: v = st.number_input("Visita", min_value=0, step=1, key=f"{p}_v")
-        preds.append((l, v))
-    
-    if st.button("Enviar Pronóstico"):
-        # AQUÍ IRÍA LA CONEXIÓN A GOOGLE SHEETS PARA GUARDAR
-        st.success(f"¡Listo {nombre}! Pronóstico guardado.")
-        st.balloons()
+    with st.form("formulario_prode"):
+        nombre = st.text_input("Tu Nombre/Apodo:")
+        
+        resultados = []
+        for i, p in enumerate(partidos):
+            st.write(f"**{p}**")
+            c1, c2 = st.columns(2)
+            l = c1.number_input("Goles Local", min_value=0, step=1, key=f"l_{i}")
+            v = c2.number_input("Goles Visita", min_value=0, step=1, key=f"v_{i}")
+            resultados.extend([l, v])
+            st.divider()
+
+        enviado = st.form_submit_button("Enviar Pronóstico")
+
+        if enviado:
+            if nombre:
+                # Crear nueva fila de datos
+                nueva_fila = [nombre] + resultados + [datetime.now().strftime("%Y-%m-%d %H:%M")]
+                
+                # Leer datos actuales y agregar el nuevo
+                data_existente = conn.read(worksheet="pronosticos")
+                # Lógica para guardar (esto requiere el link en Secrets)
+                st.success(f"¡Gracias {nombre}! Tu pronóstico fue registrado.")
+                st.balloons()
+            else:
+                st.error("Por favor, poné tu nombre.")
 
 with tab2:
-    st.header("Ranking General")
-    # Ejemplo de cómo calcularías los puntos
-    st.info("Aquí aparecerá la tabla cuando cargues los resultados reales.")
-    # data = pd.DataFrame({"Jugador": ["Gringo", "Cacho"], "Puntos": [15, 12]})
-
-    # st.table(data.sort_values(by="Puntos", ascending=False))
+    st.write("Acá verás los puntos pronto...")
